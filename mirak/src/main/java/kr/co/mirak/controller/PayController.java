@@ -157,7 +157,8 @@ public class PayController {
 	@RequestMapping(value = "/paySubmit", method = RequestMethod.POST)
 	public String payment(PayStringVO payStringVO, HttpSession session) {
 		
-		int result = payService.adaptPayVO(payStringVO, session);
+		System.out.println(payStringVO);
+		payService.adaptPayVO(payStringVO, session);
 		
 
 		// 실제 결제

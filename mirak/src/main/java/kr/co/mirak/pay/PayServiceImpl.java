@@ -63,9 +63,8 @@ public class PayServiceImpl implements PayService {
 		return list;
 	}
 
-	public int adaptPayVO(PayStringVO payStringVO, HttpSession session) {
+	public void adaptPayVO(PayStringVO payStringVO, HttpSession session) {
 		String mem_id = (String) session.getAttribute("mem_id");
-		int success = 0;
 		// pro_code, cart_cnt, pay_req
 		PayMapper mapper = sqlSessionTemplate.getMapper(PayMapper.class);
 		System.out.println(payStringVO.toString());
@@ -83,7 +82,6 @@ public class PayServiceImpl implements PayService {
 
 		}
 
-		return success;
 	}
 
 }
