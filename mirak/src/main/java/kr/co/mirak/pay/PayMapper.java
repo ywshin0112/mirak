@@ -5,7 +5,7 @@ import java.util.List;
 import kr.co.mirak.cart.CartVO;
 
 public interface PayMapper {
-	List<PayVO> list();
+	List<PayVO> getPayList();
 	PayVO info(int id);
 	int insert(PayVO vo);
 	int update(PayVO vo);
