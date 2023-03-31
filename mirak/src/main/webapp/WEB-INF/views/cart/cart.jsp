@@ -330,6 +330,8 @@ function CheckTest() {
 //   cntInput.addEventListener('input', calculateTotalPrice);
 // });
 
+
+// 모달 중간합계
 function calculateTotalPrice() { 
 	  const cart_cnt = parseInt(this.value);
 	  const pro_price = parseInt(this.parentNode.parentNode.querySelector('.form-control[name="pro_price"]').value);
@@ -342,6 +344,9 @@ function calculateTotalPrice() {
 	cntInputList.forEach(cntInput => {
 	  cntInput.addEventListener('input', calculateTotalPrice);
 	});
+	
+	
+	
 	
 
 	
