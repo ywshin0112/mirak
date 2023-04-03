@@ -30,10 +30,12 @@ import kr.co.mirak.pay.PayService;
 import kr.co.mirak.pay.PayStringVO;
 import kr.co.mirak.pay.PayVO;
 import kr.co.mirak.pay.chart.ChartData;
+import kr.co.mirak.pay.chart.ChartMainVO;
 import kr.co.mirak.pay.chart.ChartService;
 import kr.co.mirak.pay.chart.PurchaseRateVO;
 import kr.co.mirak.pay.chart.RatioByVO;
 import kr.co.mirak.pay.chart.TotalByMenuVO;
+import kr.co.mirak.pay.chart.TotalUsersVO;
 import kr.co.mirak.product.ProductService;
 import kr.co.mirak.product.ProductVO;
 
@@ -70,6 +72,7 @@ public class PayController {
 		if (mem_id == null) {
 			String preUrl = "/pay/" + pro_code + "/" + cart_cnt + "/" + cart_start + "/" + URLEncoder.encode(cart_day, "UTF-8");
 			session.setAttribute("pre_url", preUrl);
+			session.setAttribute("message", "로그인 후 이용해주세요.");
 			return "redirect:/login";
 		}
 		
@@ -181,6 +184,15 @@ public class PayController {
 		// mypage 결제내역으로 이동 아직 페이지 없음
 		return "redirect:/mypage";
 	}
+	
+	@RequestMapping(value = "/updateDetailInfo", method = RequestMethod.POST)
+	public String updateDetailInfo(Model model, PayVO payVO) {
+		System.out.println(payVO);
+		
+		int result = payService.updateDetailInfo(payVO);
+		
+		return "redirect:/payInfo";
+	}
 
 	@RequestMapping(value = "/admin/pays/{num}", method = RequestMethod.GET)
 	public String getAdminPayList(ProductVO productVO, PayVO payVO, Model model, CriteriaP criP, @PathVariable("num") int num) {
@@ -241,15 +253,22 @@ public class PayController {
 
 	    TotalByMenuVO mvo = new TotalByMenuVO();
 	    PurchaseRateVO pvo = new PurchaseRateVO();
+	    TotalUsersVO ivo = new TotalUsersVO();
+	    ChartMainVO cvo = new ChartMainVO();
 
 		Map<String, List<Object>> totalBymenulist = chartService.getTotalByMenuList(mvo);
 		Map<String, List<Object>> purchaseRateList = chartService.getPurchaseRateList(pvo);
+		Map<String, Map<String, List<Object>>> totalUsersList = chartService.getTotalUsersList(ivo);
+		Map<String, List<Object>> chartMainList = chartService.getChartMainList(cvo);
 
 		chartData.setTotalByMenuList(totalBymenulist);
 		chartData.setPurchaseRateList(purchaseRateList);
+		chartData.setTotalUsersList(totalUsersList);
+		chartData.setChartMainList(chartMainList);
 		
 		String data = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(chartData);
-		System.out.println("data ::::::::::::::::: " + data);
+		
+		System.out.println("넘어가는 data느느 ??????? " + data);
 		
 		return data;
 	}
@@ -271,9 +290,8 @@ public class PayController {
 		
 		
 		String data = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(chartData);
-		System.out.println("지금 뽑은 data는~~~~~~~~~~~~~~~~~~~ : " + data);
 		
 		return data;
 	}
-
+	
 }
