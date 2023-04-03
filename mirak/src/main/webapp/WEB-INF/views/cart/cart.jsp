@@ -160,7 +160,7 @@ session = request.getSession();
 										<p>
 											<span  class="font-weight-bold text-dark">상품 개수</span><br>
 											<!-- <input type="text" pattern="\d*" maxlength="3" id="cnt" name="cart_cnt" value="${c.cart_cnt}" class="quantity_input" min="1"> -->
-											<input type="number" class="cart_cnt" id="cart_cnt" name="cart_cnt" value="${c.cart_cnt}" min="1" onchange="calculateTotalPrice()">
+											<input type="number" class="cart_cnt" id="cart_cnt" name="cart_cnt" value="${c.cart_cnt}" min="1" max="99" style="width:300px;" onchange="calculateTotalPrice()">
 										</p>
 										<hr>
 										<p>
