@@ -106,6 +106,7 @@
 			</div>
 		</div>
 	</div>
+	
 	<!-- Modal -->
 	<c:forEach var="c" items="${cartList}">
 		 <section class="ftco-section">
@@ -146,11 +147,11 @@
 	            					&nbsp;&nbsp; 
 	            					<label for="jumal"><input type="checkbox" name="cart_jumal" id="jumal" value="jumal" onclick='selectjumal(this)'> 주말선택</label>
             					</div>
-							</div>
-									<div class="mb-2">
-										<span class="font-weight-bold text-dark">상품 개수</span><br>
-										<%-- 	<input type="number" class="form-control cart_cnt" id="cart_cnt" name="cart_cnt" value="${c.cart_cnt}" min="1" onchange="calculateTotalPrice()"> --%>
-										<div class="input-group">
+							</div>						
+							<div class="mb-2">
+								<span  class="font-weight-bold text-dark">상품 개수</span><br>
+								<!--  <input type="number" class="form-control cart_cnt" id="cart_cnt" name="cart_cnt" value="${c.cart_cnt}" min="1" max="99" onchange="calculateTotalPrice()" oninput="if(parseInt(this.value)<1) this.value='1'; if(parseInt(this.value)>99) this.value='99';"> -->
+								<div class="input-group">
 											<span class="input-group-btn mr-2">
 												<button type="button" class="btn btn-outline-secondary" data-type="minus" data-field="">
 													<i class="ion-ios-remove"></i>
@@ -162,16 +163,17 @@
 													<i class="ion-ios-add"></i>
 												</button>
 											</span>
-										</div>
-									</div>
-									<div>
+								</div>
+							</div>
+							<hr>		
+							<div>
 								<span class="font-weight-bold text-dark">총 금액</span>
 								<input type="text" class="form-control cart_totprice" id="cart_totprice" name="cart_totprice" class="totalPrice_span" value="${c.cart_cnt * c.pro_price }">
 							</div>			
 						</div>
 						<div class="modal-footer">
 							<input type="submit" value="변경" class="btn btn-primary py-3 px-5" onclick="return CheckTest();">
-							<button type="button" class="btn btn-black py-3 px-5" data-dismiss="modal">Close</button>
+							<button type="button" id="modalCloseBtn" class="btn btn-black py-3 px-5" data-dismiss="modal">Close</button>
 						</div>
 					</form>
 				</div>
@@ -184,6 +186,7 @@
 <jsp:include page="/common/client_ft.jsp"></jsp:include>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
+
 ////총금액 구하기
 //	function calculateTotalPrice() { 
 //	  const cart_cnt = parseInt(this.value);
@@ -195,6 +198,7 @@
 //	cntInputList.forEach(cntInput => {
 //	  cntInput.addEventListener('input', calculateTotalPrice);
 //	});
+
 <!-- 수량 변경 기능 -->
 $(document).ready(function(){
     $('.input-number').on('input', function(){
@@ -223,6 +227,7 @@ $(document).ready(function(){
     	  }
     });
   });
+  
   
 function selectjumal(selectjumal) {
   var checkboxes2 = document.getElementsByName('cart_day');
@@ -282,8 +287,20 @@ function CheckTest() {
     cartStartInputs.forEach(function(input) {
     	input.min = today;
     });
-  
    
+   	//총금액 구하기
+	function calculateTotalPrice() { 
+	  const cart_cnt = parseInt(this.value);
+	  const pro_price = parseInt(this.parentNode.parentNode.querySelector('.form-control[name="pro_price"]').value);
+	  const cart_totprice = this.parentNode.parentNode.querySelector('.cart_totprice');
+	  cart_totprice.value = cart_cnt * pro_price;
+	}
+
+	const cntInputList = document.querySelectorAll('.cart_cnt');
+
+	cntInputList.forEach(cntInput => {
+	  cntInput.addEventListener('input', calculateTotalPrice);
+	});
 	$(document).ready(function() {
 		// 종합 정보 삽입
 		setTotalInfo();
@@ -348,4 +365,19 @@ function CheckTest() {
 			 <%session.setAttribute("message", "");%>
 		}
 	})
+</script>
+
+<script>
+const closeBtn = document.querySelector("#modalCloseBtn");
+closeBtn.addEventListener("click", () => {
+  const cartCntInput = document.querySelector("#cart_cnt");
+  cartCntInput.value = c.cart_cnt;
+
+  const modal = document.querySelector("#modal");
+  const modalBackdrop = document.querySelector(".modal-backdrop");
+  modal.classList.remove("show");
+  modal.style.display = "none";
+  modalBackdrop.remove();
+});
+
 </script>

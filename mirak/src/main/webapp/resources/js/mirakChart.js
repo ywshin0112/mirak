@@ -12,12 +12,19 @@ $(function () {
       var chartMainList = data["chartMainList"];
       var totalRatio = totalByMenuList.totalRatio;
 
-      document.querySelector(".totalPrice_title").textContent =
-        chartMainList.totalPrice;
-      document.querySelector(".monthPrice_title").textContent =
-        chartMainList.monthPrice;
-      document.querySelector(".totalUsers_title").textContent =
-        chartMainList.totalUsers;
+      function addCommas(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      document.querySelector(".totalPrice_title").textContent = addCommas(
+        chartMainList.totalPrice
+      );
+      document.querySelector(".monthPrice_title").textContent = addCommas(
+        chartMainList.monthPrice
+      );
+      document.querySelector(".totalUsers_title").textContent = addCommas(
+        chartMainList.totalUsers
+      );
 
       const ctx1 = document.getElementById("myChart1").getContext("2d");
       const ctx4 = document.getElementById("myChart4").getContext("2d");
@@ -28,8 +35,8 @@ $(function () {
             type: "bar",
             label: "장바구니에 담긴 횟수",
             data: purchaseRateList.cart_cnt,
-            borderColor: "#696969",
-            backgroundColor: "#87CEFA",
+            borderColor: "rgba(255, 99, 132, 0.2)",
+            backgroundColor: "#51CACF",
             borderWidth: 1,
             order: 1,
             datalabels: {
@@ -59,8 +66,8 @@ $(function () {
             type: "bar",
             label: "실제 구매횟수",
             data: purchaseRateList.cart_show,
-            borderColor: "#696969",
-            backgroundColor: "#F08080",
+            borderColor: "rgba(255, 99, 132, 0.2)",
+            backgroundColor: "#dc3545",
             borderWidth: 1,
             order: 2,
             datalabels: {
@@ -102,17 +109,17 @@ $(function () {
           labels: totalByMenuList.pro_name,
           datasets: [
             {
-              label: "Emails",
+              label: "Menus",
               pointRadius: 0,
               pointHoverRadius: 0,
               backgroundColor: [
                 "#fb8622",
                 "#ffc107",
                 "#dc3545",
-                "#212529",
-                "#17a2b8",
+                "#6c757d",
+                "#51CACF",
               ],
-              borderWidth: 0,
+              borderWidth: 1,
               data: totalByMenuList.totalPrice,
             },
           ],
@@ -209,8 +216,15 @@ $(function () {
         pointBorderWidth: 8,
       };
 
+      const femaleDates = totalUsersList.여자.regdate;
+      const maleDates = totalUsersList.남자.regdate;
+
+      const uniqueDates = [...new Set([...femaleDates, ...maleDates])].map(
+        (date) => date.substr(5, 5)
+      );
+
       var speedData = {
-        labels: totalUsersList.여자.regdate,
+        labels: uniqueDates,
         datasets: [dataFirst, dataSecond],
       };
 
@@ -227,6 +241,165 @@ $(function () {
         hover: false,
         data: speedData,
         options: chartOptions,
+      });
+
+      var bestByGenderList = data["bestByGenderList"];
+      
+      var sortedAgeGroups = Object.keys(bestByGenderList).sort();
+
+      var sortedBestByGenderList = {};
+      sortedAgeGroups.forEach(function (ageGroup) {
+      sortedBestByGenderList[ageGroup] = bestByGenderList[ageGroup];
+      });
+
+      var ctx2 = document.getElementById("myChart2").getContext("2d");
+
+      var data = {
+        labels: sortedBestByGenderList["10대"]["pro_name"],
+        datasets: [
+          {
+            label: "10대",
+            data: sortedBestByGenderList["10대"]["total_Price"].map(
+              (price, index) =>
+                (price / 100) * sortedBestByGenderList["10대"]["ratio"][index]
+            ),
+            backgroundColor: "#ffc107",
+            borderColor: "white",
+            borderWidth: 1,
+          },
+          {
+            label: "20대",
+            data: sortedBestByGenderList["20대"]["total_Price"].map(
+              (price, index) =>
+                (price / 100) * sortedBestByGenderList["20대"]["ratio"][index]
+            ),
+            backgroundColor: "#fb8622",
+            borderColor: "white",
+            borderWidth: 1,
+          },
+          {
+            label: "30대",
+            data: sortedBestByGenderList["30대"]["total_Price"].map(
+              (price, index) =>
+                (price / 100) * sortedBestByGenderList["30대"]["ratio"][index]
+            ),
+            backgroundColor: "#51CACF",
+            borderColor: "white",
+            borderWidth: 1,
+          },
+          {
+            label: "40대",
+            data: sortedBestByGenderList["40대"]["total_Price"].map(
+              (price, index) =>
+                (price / 100) * sortedBestByGenderList["40대"]["ratio"][index]
+            ),
+            backgroundColor: "#6c757d",
+            borderColor: "white",
+            borderWidth: 1,
+          },
+          {
+            label: "50대",
+            data: sortedBestByGenderList["50대"]["total_Price"].map(
+              (price, index) =>
+                (price / 100) * sortedBestByGenderList["50대"]["ratio"][index]
+            ),
+            backgroundColor: "#dc3545",
+            borderColor: "white",
+            borderWidth: 1,
+          },
+        ],
+      };
+
+      var options = {
+        responsive: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          datalabels: {
+            color: "#fff",
+            font: {
+              weight: "bold",
+              size: "14",
+            },
+            formatter: function (value, context) {
+              var ageGroups = Object.keys(sortedBestByGenderList);
+              var ratiosByMenu = {};
+              ageGroups.forEach(function (ageGroup) {
+                var proNames = sortedBestByGenderList[ageGroup]["pro_name"];
+                console.log(proNames);
+                var ratios = sortedBestByGenderList[ageGroup]["ratio"];
+                console.log(ratios);
+                for (var i = 0; i < proNames.length; i++) {
+                  var proName = proNames[i];
+                  var ratio = ratios[i];
+                  if (!(proName in ratiosByMenu)) {
+                    ratiosByMenu[proName] = Array(ageGroups.length).fill(null);
+                  }
+                  var ageIndex = ageGroups.indexOf(ageGroup);
+                  ratiosByMenu[proName][ageIndex] = ratio;
+                }
+              });
+
+              var proNames = Object.keys(ratiosByMenu);
+              var proName = proNames[context.dataIndex];
+              var ratios = ratiosByMenu[proName];
+
+              if (ratios) {
+                var sortedRatios = ratios.slice().sort(function (a, b) {
+                  return b - a;
+                });
+                var maxRatioIndex = ratios.indexOf(sortedRatios[0]);
+                var secondMaxRatioIndex = ratios.indexOf(sortedRatios[1]);
+
+                if (context.datasetIndex === maxRatioIndex) {
+                  return sortedRatios[0].toFixed(1) + "%";
+                } else if (context.datasetIndex === secondMaxRatioIndex) {
+                  return sortedRatios[1].toFixed(1) + "%";
+                } else {
+                  return "";
+                }
+              } else {
+                return "";
+              }
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                var label = context.dataset.label || "";
+                if (label) {
+                  label += ": ";
+                }
+                if (context.parsed.y !== null) {
+                  label += Math.ceil(context.parsed.y);
+                }
+                return label;
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            stacked: true,
+            ticks: {
+              beginAtZero: true,
+            },
+          },
+          x: {
+            stacked: true,
+            ticks: {
+              autoSkip: false,
+            },
+          },
+        },
+      };
+
+      var myChart2 = new Chart(ctx2, {
+        type: "bar",
+        data: data,
+        options: options,
+        plugins: [ChartDataLabels],
       });
     },
   });
